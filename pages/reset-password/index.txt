@@ -1,0 +1,120 @@
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  TextField,
+  Stack,
+  Grid,
+  Divider,
+  Button,
+} from "@mui/material";
+
+import { useRouter } from "next/router";
+import Image from "next/image";
+
+import api from "../../services/api";
+import { setStorage, getStorage } from "../../utils/storage";
+import useToast from "../../utils/toast";
+import PngWingLogo from "../../public/static/logo/pngwing.png";
+
+const ResetPassword = () => {
+  const router = useRouter();
+  const [displayToast] = useToast();
+
+  const [resetValue, setResetValue] = useState({
+    phone_number: "",
+  });
+
+  const handleChange = (event) => {
+    setResetValue({ ...resetValue, [event.target.name]: event.target.value });
+  };
+
+  async function onFinish() {
+    try {
+      setStorage("token", "jwtToken");
+      const postDataOtp = await api.sendOtp(resetValue);
+      setStorage("nip", postDataOtp.data.data.nip);
+      router.push("/reset-password/verify");
+    } catch (error) {
+      console.log(error);
+      displayToast("error", "Failed to login");
+    }
+  }
+
+  return (
+    <>
+      <Box
+        sx={{
+          backgroundColor: "#F5F5F5",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          width: "100%",
+          height: "100vh",
+          position: "absolute",
+          left: 0,
+        }}
+      >
+        <Grid
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          style={{ minHeight: "100vh" }}
+        >
+          <Grid
+            item
+            xs={3}
+            sx={{
+              zIndex: "5",
+            }}
+          >
+            <Card
+              variant="outlined"
+              sx={{
+                width: "380px",
+                background: "#FFFFFF",
+                boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)",
+                borderRadius: " 12px",
+                padding: "10px 0px",
+              }}
+            >
+              <CardContent>
+                <Stack component="form" spacing={2} noValidate>
+                  <Box display={"flex"} justifyContent={"center"}>
+                    <Image
+                      src={PngWingLogo}
+                      width={100}
+                      height={100}
+                      alt="Png Wing Logo"
+                    />
+                  </Box>
+                  <Divider sx={{ mt: 2 }} />
+                  <TextField
+                    label="No Handphone"
+                    name="phone_number"
+                    type="text"
+                    value={resetValue.phone_number}
+                    onChange={handleChange}
+                  />
+                  <Divider sx={{ mt: 2 }} />
+                  <Button
+                    disabled={!resetValue.phone_number}
+                    onClick={onFinish}
+                    sx={{ mt: 3 }}
+                    variant="contained"
+                  >
+                    Send OTP
+                  </Button>
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
+    </>
+  );
+};
+
+export default ResetPassword;

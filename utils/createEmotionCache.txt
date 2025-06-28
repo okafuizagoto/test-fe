@@ -1,0 +1,8 @@
+import createEmotionCache from "@emotion/cache";
+
+export default function createCustomEmotionCache() {
+    return createEmotionCache({
+        key: "mui-nextjs",
+        // other configuration options
+    });
+}
